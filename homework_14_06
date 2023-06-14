@@ -1,0 +1,132 @@
+package Homework_MySQL_1406;
+
+CREATE TABLE Students (
+        id INT PRIMARY KEY,
+        name VARCHAR (128) NOT NULL,
+        age int
+        );
+
+        CREATE TABLE Teachers (
+        id INT PRIMARY KEY,
+        name VARCHAR (128) NOT NULL,
+        age int
+        );
+
+        CREATE TABLE Competencies (
+        id INT PRIMARY KEY,
+        title VARCHAR (128) NOT NULL
+        );
+
+        CREATE TABLE Teachers2Competencies (
+        id INT PRIMARY KEY,
+        teacher_id INT,
+        competencies_id INT
+        );
+
+        CREATE TABLE Courses (
+        id INT PRIMARY KEY,
+        teacher_id INT,
+        title VARCHAR (128) NOT NULL,
+        headman_id INT
+        );
+
+        CREATE TABLE Students2Courses (
+        id INT PRIMARY KEY,
+        student_id INT,
+        course_id INT
+        );
+
+        INSERT INTO homework.Students (id, name, age) values
+        (1, 'Анатолий', 29),
+        (2, 'Олег', 25),
+        (3, 'Семен', 27),
+        (4, 'Олеся', 28),
+        (5, 'Ольга', 31),
+        (6, 'Иван', 22);
+
+        INSERT INTO homework.Teachers (id, name, age) VALUES
+        (1, 'Петр', 39),
+        (2, 'Максим', 35),
+        (3, 'Антон', 37),
+        (4, 'Всеволод', 38),
+        (5, 'Егор', 41),
+        (6, 'Светлана', 32);
+
+        INSERT INTO homework.Competencies (id, title) VALUES
+        (1, 'Математика'),
+        (2, 'Информатика'),
+        (3, 'Программирование'),
+        (4, 'Графика');
+
+        INSERT INTO homework.Teachers2Competencies (id, teacher_id, competencies_id) VALUES
+        (1, 1, 1),
+        (2, 2, 1),
+        (3, 2, 3),
+        (4, 3, 2),
+        (5, 4, 1),
+        (6, 5, 3);
+
+        INSERT INTO homework.Courses (id, teacher_id, title, headman_id) VALUES
+        (1, 1, 'Алгебра логики', 2),
+        (2, 2, 'Математическая статистика', 3),
+        (3, 4, 'Высшая математика', 5),
+        (4, 5, 'Javascript', 1),
+        (5, 5, 'Базовый Python', 1);
+
+        INSERT INTO homework.Students2Courses (id, student_id, course_id) VALUES
+        (1, 1, 1),
+        (2, 2, 1),
+        (3, 3, 2),
+        (4, 3, 3),
+        (5, 4, 5);
+
+
+        -- 1) Вывести имена студентов и курсы, которые они проходят
+        SELECT Students.name, Courses.title
+        FROM Students
+        JOIN Students2Courses ON Students.id = Students2Courses.student_id
+        JOIN Courses ON Students2Courses.course_id = Courses.id;
+
+        -- 2) Вывести имена всех преподавателей с их компетенциями
+        SELECT Teachers.name, Competencies.title
+        FROM Teachers
+        JOIN Teachers2Competencies ON Teachers.id = Teachers2Competencies.teacher_id
+        JOIN Competencies ON Teachers2Competencies.competencies_id = Competencies.id;
+
+
+        -- 3) Найти преподавателя, у которого нет компетенций
+        SELECT Teachers.name
+        FROM Teachers
+        LEFT JOIN Teachers2Competencies ON Teachers.id = Teachers2Competencies.teacher_id
+        WHERE Teachers2Competencies.teacher_id IS NULL;
+
+        -- 4) Найти имена студентов, которые не проходят ни один курс
+        SELECT Students.name
+        FROM Students
+        LEFT JOIN Students2Courses ON Students.id = Students2Courses.student_id
+        WHERE Students2Courses.student_id IS NULL;
+
+        -- 5) Найти курсы, которые не посещает ни один студент
+        SELECT Courses.title
+        FROM Courses
+        LEFT JOIN Students2Courses ON Courses.id = Students2Courses.course_id
+        WHERE Students2Courses.course_id IS NULL;
+
+        -- 6) Найти компетенции, которых нет ни у одного преподавателя
+        SELECT Competencies.title
+        FROM Competencies
+        LEFT JOIN Teachers2Competencies ON Competencies.id = Teachers2Competencies.competencies_id
+        WHERE Teachers2Competencies.competencies_id IS NULL;
+
+        -- 7) Вывести название курса и имя старосты
+        SELECT Courses.title, Students.name AS headman_name
+        FROM Courses
+        JOIN Students ON Courses.headman_id = Students.id;
+
+        -- 8) Вывести имя студента и имена старост, которые есть на курсах, которые он проходит
+        SELECT Students.name AS student_name, Headman.name AS headman_name
+        FROM Students
+        JOIN Students2Courses ON Students.id = Students2Courses.student_id
+        JOIN Courses ON Students2Courses.course_id = Courses.id
+        JOIN Students AS Headman ON Courses.headman_id = Headman.id;
+
